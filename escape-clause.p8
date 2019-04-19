@@ -2,7 +2,49 @@ pico-8 cartridge // http://www.pico-8.com
 version 18
 __lua__
 
+-- rather than worry about z-order, we just have different tables
+-- and set render order in code
+
 particles = {}
+sprites = {}
+
+particle = {}
+particle.__index=particle
+
+function particle:new(x, y)
+    return setmetatable({x=x, y=y, age=0}, self)
+end
+
+-- update methods return true if alive, false if dead
+
+function particle:update()
+    if (self.age > 30) return false
+
+    self.age +=1
+    return true
+end
+
+-- draw methods draw stuff, and return nothing
+
+function particle:draw()
+    local c = 7
+    if (self.age>10) c=6
+    if (self.age>20) c=13
+
+    pset(self.x, self.y, c)
+end
+
+function do_draw(e) e:draw() end
+
+function draw_all(coll)
+    foreach(coll, do_draw)
+end
+
+function update_all(coll)
+    for t in all(coll) do
+        if(t:update() == false) del(coll, t)
+    end
+end
 
 ship = {x = 64, y = 64, pgap = 0}
 
@@ -18,44 +60,33 @@ function ship:update()
 
     if self.pgap > 1 then
         if moved then
-            add(particles, {x = self.x, y = self.y, age=0})
+            add(particles, particle:new(self.x, self.y))
         end
         self.pgap = 0
-    end    
+    end
+
+    return true
 end
 
 function ship:draw()
     spr(0, self.x - 4, self.y - 4)
 end
 
-function update_particles()
-    for p in all(particles) do
-        if p.age > 30 then del(particles, p)
-        else
-            p.age += 1
-        end
-    end
+function _init()
+    add(sprites, ship)
 end
 
-function draw_particles()
-    for p in all(particles) do
-        local c = 7
-        if (p.age>10) c = 6
-        if (p.age>20) c = 13
-
-        pset(p.x, p.y, c)
-    end
-end
-    
 function _update60()
-    update_particles()
-    ship:update()
+    update_all(particles)
+    update_all(sprites)
 end
 
 function _draw()
     cls()
-    draw_particles()
-    ship:draw()
+    color(1)
+    print(#particles .. " particles, " .. #sprites .. " sprites", 0, 0)
+    draw_all(particles)
+    draw_all(sprites)
 end
 
 __gfx__
