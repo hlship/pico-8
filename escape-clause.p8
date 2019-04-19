@@ -74,11 +74,20 @@ end
 function _update60()
     update_all(particles)
     update_all(sprites)
+
+    show_grid = not show_grid
 end
+
+show_grid = false
 
 function _draw()
     cls()
-    color(1)
+    color(5)
+    for i = -1000, 1000, 30 do
+        line(i, -1000, i, 1000)
+        line(-1000, i, 1000, i)
+    end
+    color(12)
     print(#particles .. " particles, " .. #sprites .. " sprites", 0, 0)
     draw_all(particles)
     draw_all(sprites)
