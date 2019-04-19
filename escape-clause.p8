@@ -4,29 +4,29 @@ __lua__
 
 particles = {}
 
-ship =
-    {x = 64, y = 64, pgap = 0,
-     update = function(t)
-        
-        moved = false
+ship = {x = 64, y = 64, pgap = 0}
 
-        if (btn(1)) then moved = true; t.x += 1 end
-        if (btn(0)) then moved = true; t.x -= 1 end
-        if (btn(2)) then moved = true; t.y -= 1 end
-        if (btn(3)) then moved = true; t.y += 1 end
+function ship:update()
+    local moved = false
 
-        t.pgap += 1
+    if (btn(➡️)) then moved = true; self.x += 1 end
+    if (btn(⬅️)) then moved = true; self.x -= 1 end
+    if (btn(⬆️)) then moved = true; self.y -= 1 end
+    if (btn(⬇️)) then moved = true; self.y += 1 end
 
-        if t.pgap > 1 then
-            if moved then
-                add(particles, {x = t.x, y = t.y, age=0})
-            end
-            t.pgap = 0
+    self.pgap += 1
+
+    if self.pgap > 1 then
+        if moved then
+            add(particles, {x = self.x, y = self.y, age=0})
         end
-     end,
-     draw = function(t)
-        spr(0, t.x - 4, t.y - 4)
-    end}
+        self.pgap = 0
+    end    
+end
+
+function ship:draw()
+    spr(0, self.x - 4, self.y - 4)
+end
 
 function update_particles()
     for p in all(particles) do
@@ -39,7 +39,7 @@ end
 
 function draw_particles()
     for p in all(particles) do
-        c = 7
+        local c = 7
         if (p.age>10) c = 6
         if (p.age>20) c = 13
 
@@ -47,21 +47,13 @@ function draw_particles()
     end
 end
     
-function _init()
-
-end
-
--->8
 function _update60()
     update_particles()
     ship:update()
 end
 
--->8
 function _draw()
     cls()
-    --color(7)
-    --print(count(particles) .. " particles", 0, 0)
     draw_particles()
     ship:draw()
 end
