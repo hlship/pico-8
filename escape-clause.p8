@@ -8,30 +8,27 @@ __lua__
 particles = {}
 sprites = {}
 
-particle = {}
-particle.__index=particle
 
-function particle:new(x, y)
-    return setmetatable({x=x, y=y, age=0}, self)
-end
+-- update methods return true iff sprite/particle/etc. can be deleted
 
--- update methods return true if alive, false if dead
-
-function particle:update()
-    if (self.age > 30) return false
+function particle_update(self)
+    if (self.age > 30) return true
 
     self.age +=1
-    return true
 end
 
 -- draw methods draw stuff, and return nothing
 
-function particle:draw()
+function particle_draw(self)
     local c = 7
     if (self.age>10) c=6
     if (self.age>20) c=13
 
     pset(self.x, self.y, c)
+end
+
+function new_particle(x, y)
+    return {x=x, y=y, age=0, update=particle_update, draw=particle_draw}
 end
 
 function do_draw(e) e:draw() end
@@ -42,7 +39,7 @@ end
 
 function update_all(coll)
     for t in all(coll) do
-        if(t:update() == false) del(coll, t)
+        if(t:update()) del(coll, t)
     end
 end
 
@@ -60,12 +57,10 @@ function ship:update()
 
     if self.pgap > 1 then
         if moved then
-            add(particles, particle:new(self.x, self.y))
+            add(particles, new_particle(self.x, self.y))
         end
         self.pgap = 0
     end
-
-    return true
 end
 
 function ship:draw()
