@@ -22,7 +22,7 @@ function particle_update(self)
     self.age +=1
 end
 
--- draw methods draw stuff, and return nothing
+-- draw..... methods draw stuff, and return nothing
 
 function particle_draw(self)
     local c = 7
@@ -100,7 +100,8 @@ function ship:update()
 
     if self.pgap > 1 then
         if thrust then
-            add(particles, new_particle(self.x, self.y))
+            add(particles, new_particle(self.x - 4 * cos(self.d), 
+                                        self.y - 4 * sin(self.d)))
         end
         self.pgap = 0
     end
@@ -111,10 +112,15 @@ function ship:draw()
     --       " d=" .. self.d ..
     --       " r=" .. self.r, 0, 0, 12)
 
-    line(self.x, self.y, 
-         self.x + 6 * cos(self.d),
-         self.y + 6 * sin(self.d), 3)
-    pset(self.x, self.y, 8)
+    local cosd = cos(self.d)
+    local sind = sin(self.d)
+
+    line(self.x - 3 * cosd, 
+         self.y - 3 * sind, 
+         self.x + 3 * cosd, 
+         self.y + 3 * sind,
+         6)
+    pset(self.x -4 * cosd, self.y - 4 * sind, 8)
 
 end
 
