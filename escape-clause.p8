@@ -65,20 +65,28 @@ function add_vectors(amag, arot, bmag, brot)
     return r, atan2(rx, ry)
 end
 
+
+-- The camera moves to follow the ship, the camera will try
+-- adto keep the ship centered
+viewtrack = {x = 0, y = 0}
+
 -- x,y screen location
 -- pgap used to track how often to emit a thrust particle
 -- speed pixels/second in direction d
 -- r angle of movement
--- d angle of direction
+-- d angle of direction (way ship is pointing)
 ship = {x = 64, y = 64, pgap = 0, d = .87, speed = 0}
 
 rotspeed = 1 / 60 -- 1 second for full rotation
+thrustpower = .5
 
 function ship:update()
 
     if (btn(➡️)) self.d -= rotspeed
     if (btn(⬅️)) self.d += rotspeed
     local thrust = btn(❎)
+
+    if (btn(🅾️)) self.speed = 0
     
     -- Constrain d angle to 0..1
     -- may not be necessary
@@ -87,7 +95,7 @@ function ship:update()
     if (self.d<0) self.d += 1
 
     if thrust then
-        self.speed, self.r = add_vectors(self.speed, self.r, .5, self.d)
+        self.speed, self.r = add_vectors(self.speed, self.r, thrustpower, self.d)
     end
 
     --  speed is pixels / frame
@@ -130,22 +138,32 @@ function _init()
     add(sprites, ship)
 end
 
+track_speed = .025
+
 function _update60()
     update_all(particles)
     update_all(sprites)
 
-    show_grid = not show_grid
+    -- Have the view track the ship
+    viewtrack.x = lerp(viewtrack.x, ship.x - 64, track_speed)
+    viewtrack.y = lerp(viewtrack.y, ship.y - 64, track_speed)
 end
 
 show_grid = false
 
 function _draw()
-    cls()    
+    cls() 
+    
+    camera(viewtrack.x, viewtrack.y)
+
     color(5)
+    
     for i = -1000, 1000, 30 do
         line(i, -1000, i, 1000)
         line(-1000, i, 1000, i)
     end
+
+
     draw_all(particles)
     draw_all(sprites)
 end
