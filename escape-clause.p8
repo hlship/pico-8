@@ -8,6 +8,13 @@ function lerp(l, h, t)
     return (1 - t) * l + (t * h)
 end
 
+-- moves t via speed and r
+function vector_move(t)
+    t.x += t.speed * cos(t.r) / 60
+    t.y += t.speed * sin(t.r) / 60
+end
+
+
 -- rather than worry about z-order, we just have different tables
 -- and set render order in code
 
@@ -17,9 +24,11 @@ sprites = {}
 -- update methods return true iff sprite/particle/etc. can be deleted
 
 function particle_update(self)
-    if (self.age > 30) return true
+    if (self.age > 60) return true
 
     self.age +=1
+
+    vector_move(self)
 end
 
 -- draw..... methods draw stuff, and return nothing
@@ -29,11 +38,14 @@ function particle_draw(self)
     if (self.age>10) c=6
     if (self.age>20) c=13
 
+    if (self.age>40) c=1
+
     pset(self.x, self.y, c)
 end
 
-function new_particle(x, y)
-    return {x=x, y=y, age=0, update=particle_update, draw=particle_draw}
+function new_particle(x, y, speed, r)
+    return {x=x, y=y, age=0, speed=speed, r=r, 
+            update=particle_update, draw=particle_draw}
 end
 
 function foreachm(coll, method_name)
@@ -84,9 +96,9 @@ function ship:update()
 
     if (btn(➡️)) self.d -= rotspeed
     if (btn(⬅️)) self.d += rotspeed
-    local thrust = btn(❎)
+    local thrust = btn(4)
 
-    if (btn(🅾️)) self.speed = 0
+    if (btn(5)) self.speed = 0
     
     -- Constrain d angle to 0..1
     -- may not be necessary
@@ -100,8 +112,7 @@ function ship:update()
 
     --  speed is pixels / frame
 
-    self.x += self.speed * cos(self.r) / 60
-    self.y += self.speed * sin(self.r) / 60
+    vector_move(self)
 
     -- pgap is used to skip frames between emitting a particle
     self.pgap += 1
@@ -109,7 +120,9 @@ function ship:update()
     if self.pgap > 1 then
         if thrust then
             add(particles, new_particle(self.x - 4 * cos(self.d), 
-                                        self.y - 4 * sin(self.d)))
+                                        self.y - 4 * sin(self.d),
+                                        20,
+                                        self.d + .5))
         end
         self.pgap = 0
     end
