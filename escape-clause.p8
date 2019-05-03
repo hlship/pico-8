@@ -97,34 +97,21 @@ function ship:update()
     if (btn(➡️)) self.d -= rotspeed
     if (btn(⬅️)) self.d += rotspeed
     local thrust = btn(4)
-
-    if (btn(5)) self.speed = 0
     
-    -- Constrain d angle to 0..1
-    -- may not be necessary
-
-    if (self.d>1) self.d -= 1
-    if (self.d<0) self.d += 1
-
     if thrust then
         self.speed, self.r = add_vectors(self.speed, self.r, thrustpower, self.d)
+    else
+        -- At slow speeds, apply a damper to stop the ship
+        if (self.speed < 10) self.speed=max(0, self.speed - .25)
     end
-
-    --  speed is pixels / frame
 
     vector_move(self)
 
-    -- pgap is used to skip frames between emitting a particle
-    self.pgap += 1
-
-    if self.pgap > 1 then
-        if thrust then
-            add(particles, new_particle(self.x - 4 * cos(self.d), 
-                                        self.y - 4 * sin(self.d),
-                                        20,
-                                        self.d + .5))
-        end
-        self.pgap = 0
+    if thrust then
+        local pspeed, pr = add_vectors(self.speed, self.r, 20, self.d + .5)
+        add(particles, new_particle(self.x - 4 * cos(self.d), 
+                                    self.y - 4 * sin(self.d),
+                                    pspeed, pr))
     end
 end
 
@@ -179,6 +166,9 @@ function _draw()
 
     draw_all(particles)
     draw_all(sprites)
+
+    camera()
+    -- print("speed=" .. ship.speed, 0, 0, 12)
 end
 
 __gfx__
