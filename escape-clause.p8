@@ -103,20 +103,23 @@ function ship:update()
     if thrust then
         self.speed, self.r = add_vectors(self.speed, self.r, thrustpower, self.d)
         self.speed = min(self.speed, 150)
+
+        local pspeed, pr = add_vectors(self.speed, self.r, 20, self.d + .5)
+
+        add(particles, new_particle(self.x - 4 * cos(self.d), 
+                                    self.y - 4 * sin(self.d),
+                                    pspeed, pr))
+
+        if (not (self.thrusting)) sfx(0, 0)                                    
     else
+        if (self.thrusting) sfx(-2, 0)
         -- At slow speeds, apply a damper to stop the ship
         if (self.speed < 10) self.speed=max(0, self.speed - .25)
     end
 
     vector_move(self)
 
-    if thrust then
-        local pspeed, pr = add_vectors(self.speed, self.r, 20, self.d + .5)
-
-        add(particles, new_particle(self.x - 4 * cos(self.d), 
-                                    self.y - 4 * sin(self.d),
-                                    pspeed, pr))
-    end
+    self.thrusting = thrust
 end
 
 function ship:draw()
@@ -184,4 +187,4 @@ __map__
 0202020202020202020202020200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0202020202020202020202020200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __sfx__
-00010000090500d05010050110500f050090500905008050020500105000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+000d060a0161001620016300163001620006100061000610006100061000610006000060000600006000060000600006000060000600006000060000600006000060000600006000060000600006000060000600
