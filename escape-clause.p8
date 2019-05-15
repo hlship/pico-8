@@ -26,6 +26,8 @@ end
 particles = {}
 sprites = {}
 
+camera_track = {}
+
 -- update methods return true iff sprite/particle/etc. can be deleted
 
 function particle_update(self)
@@ -110,7 +112,7 @@ function ship:update()
                                     self.y - 4 * sin(self.d),
                                     pspeed, pr))
 
-        if (not (self.thrusting)) sfx(0, 0)                                    
+        if (not (self.thrusting)) sfx(0, 0)
     else
         if (self.thrusting) sfx(-2, 0)
         -- At slow speeds, apply a damper to stop the ship
@@ -139,19 +141,42 @@ function _init()
     ship.r = ship.d
 
     add(sprites, ship)
+
+    camera_track.x = ship.x - 64
+    camera_track.y = ship.y - 64
+    camera_track.scrolling = 0
 end
 
 function _update60()
     update_all(particles)
     update_all(sprites)
-end
 
-show_grid = false
+    if camera_track.scrolling > 0 then
+        camera_track.x += camera_track.dx
+        camera_track.y += camera_track.dy
+        camera_track.scrolling -= 1
+    else
+        local dx = ship.x - camera_track.x
+        local dy = ship.y - camera_track.y
+        camera_track.dx = 0
+        camera_track.dy = 0
+
+        if dx > 120 then
+            camera_track.dx = 2
+        elseif dx < 18 then
+            camera_track.dx = -2
+        end
+
+        if (camera_track.dx != 0) or (camera_track.dy != 0) then
+            camera_track.scrolling = 50
+        end
+    end
+end
 
 function _draw()
     cls() 
-    
-    camera(ship.x - 64, ship.y - 64)
+
+    camera(camera_track.x, camera_track.y)
 
     color(5)
     
