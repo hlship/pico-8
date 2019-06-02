@@ -131,10 +131,7 @@ function _init()
     camera_track.scrolling = 0
 end
 
-function _update60()
-    update_all(particles)
-    update_all(sprites)
-
+function update_camera()
     if camera_track.scrolling > 0 then
         camera_track.x += camera_track.dx
         camera_track.y += camera_track.dy
@@ -151,10 +148,22 @@ function _update60()
             camera_track.dx = -2
         end
 
+        if dy > 120 then
+            camera_track.dy = 2
+        elseif dy < 18 then
+            camera_track.dy = -2
+        end
+
         if (camera_track.dx != 0) or (camera_track.dy != 0) then
             camera_track.scrolling = 50
         end
     end
+end
+
+function _update60()
+    update_all(particles)
+    update_all(sprites)
+    update_camera()
 end
 
 function _draw()
