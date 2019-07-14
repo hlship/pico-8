@@ -91,9 +91,12 @@ function ship:update()
 
         local pspeed, pr = add_vectors(self.speed, self.r, 20, self.d + .5)
 
+        local r1 = 5 * (rnd(2) - 1)
+        local r2 = .01 * (rnd(2) - 1)
+
         add(particles, new_particle(self.x - 4 * cos(self.d), 
                                     self.y - 4 * sin(self.d),
-                                    pspeed, pr))
+                                    pspeed + r1, pr + r2))
 
         if (not (self.thrusting)) sfx(0, 0)
     else
@@ -130,7 +133,7 @@ function update_camera()
 
     local d = atan2(dx, dy)
 
-    camera_track.x += flr(cos(d) * dist / 10)
-    camera_track.y += flr(sin(d) * dist / 10)
+    camera_track.x += flr(cos(d) * dist / 20)
+    camera_track.y += flr(sin(d) * dist / 20)
 
 end
