@@ -121,6 +121,16 @@ function ship:draw()
 end
 
 function update_camera()
-        local dx = ship.x - camera_track.x
-        local dy = ship.y - camera_track.y
+    local dx = ship.x - 64 - camera_track.x
+    local dy = ship.y - 64 - camera_track.y
+
+    local dist = sqrt(dx * dx + dy * dy)
+
+    if (dist < 20) return
+
+    local d = atan2(dx, dy)
+
+    camera_track.x += flr(cos(d) * dist / 10)
+    camera_track.y += flr(sin(d) * dist / 10)
+
 end
