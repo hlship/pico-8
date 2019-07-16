@@ -20,7 +20,8 @@ end
 function _draw()
     cls() 
 
-    camera(camera_track.x, camera_track.y)    color(5)
+    camera(camera_track.x, camera_track.y)
+    color(5)
     
     for i = -1000, 1000, 30 do
         line(i, -1000, i, 1000)
@@ -32,5 +33,4 @@ function _draw()
     draw_all(sprites)
 
     camera()
-    print("speed=" .. ship.speed, 0, 0, 12)
 end
