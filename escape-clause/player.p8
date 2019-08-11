@@ -4,11 +4,18 @@ __lua__
 
 
 -- x,y screen location
--- pgap used to track how often to emit a thrust particle
 -- speed pixels/second in direction d
 -- r angle of movement
 -- d angle of direction (way ship is pointing)
-ship = {x = 64, y = 64, pgap = 0, d = .87, speed = 0}
+ship = {}
+
+function ship:init()
+ self.x = 64
+ self.y = 64
+ self.d = 0
+ self.r = 0
+ self.speed = 0
+end
 
 rotspeed = 1 / 60 -- 1 second for full rotation
 thrustpower = .5
@@ -30,8 +37,8 @@ function ship:update()
         local r1 = 5 * (rnd(2) - 1)
         local r2 = .01 * (rnd(2) - 1)
 
-        add(particles, new_particle(self.x - 4 * cos(self.d), 
-                                    self.y - 4 * sin(self.d),
+        add(particles, new_particle(self.x - 8 * cos(self.d), 
+                                    self.y - 8 * sin(self.d),
                                     pspeed + r1, pr + r2))
 
         if (not (self.thrusting)) sfx(0, 0)
@@ -47,14 +54,9 @@ function ship:update()
 end
 
 function ship:draw()
-    local cosd = cos(self.d)
-    local sind = sin(self.d)
+    spr(0, ship.x - 8, ship.y - 8, 2, 2)
+end
 
-    line(self.x - 3 * cosd, 
-         self.y - 3 * sind, 
-         self.x + 3 * cosd, 
-         self.y + 3 * sind,
-         6)
-    pset(self.x -4 * cosd, self.y - 4 * sind, 8)
-
+function ship:move_camera()
+    camera(ship.x - 64, ship.y - 64)
 end
